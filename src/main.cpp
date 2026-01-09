@@ -186,41 +186,22 @@ void setupWebServer() {
 }
 
 void handleStream(AsyncWebServerRequest *request) {
-  AsyncWebServerResponse *response = request->beginChunkedResponse(
+  // Note: This is a simplified stream handler
+  // For production MJPEG streaming, consider using esp32-camera's built-in stream server
+  // or a dedicated streaming library
+  
+  AsyncWebServerResponse *response = request->beginResponse(
+    200, 
     "multipart/x-mixed-replace; boundary=frame",
-    [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
-      camera_fb_t * fb = esp_camera_fb_get();
-      if (!fb) {
-        Serial.println("❌ Camera capture failed");
-        return 0;
-      }
-      
-      size_t len = 0;
-      if (index == 0) {
-        String header = "--frame\r\nContent-Type: image/jpeg\r\nContent-Length: " + 
-                       String(fb->len) + "\r\n\r\n";
-        len = header.length();
-        if (len <= maxLen) {
-          memcpy(buffer, header.c_str(), len);
-        }
-      } else if (index < fb->len) {
-        size_t copy_len = min(maxLen, fb->len - index);
-        memcpy(buffer, fb->buf + index, copy_len);
-        len = copy_len;
-      } else {
-        String footer = "\r\n";
-        len = footer.length();
-        if (len <= maxLen) {
-          memcpy(buffer, footer.c_str(), len);
-        }
-      }
-      
-      esp_camera_fb_return(fb);
-      return len;
-    }
+    "Streaming not fully implemented. Use ESP32-CAM example stream server."
   );
   
   request->send(response);
+  
+  // TODO: For full MJPEG implementation, use:
+  // 1. httpd_handle from esp_http_server.h for proper streaming
+  // 2. Or integrate CameraWebServer example from esp32-camera library
+  // 3. Current AsyncWebServer approach requires complex state management
 }
 
 void runInference() {

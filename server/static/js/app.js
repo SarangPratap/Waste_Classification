@@ -255,6 +255,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Update stats every 5 seconds
     setInterval(updateStats, 5000);
+    
+    // Allow Enter key to connect stream
+    document.getElementById('espIpInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            connectToStream();
+        }
+    });
 });
 
 // Fetch recent predictions on load
@@ -279,12 +286,3 @@ async function fetchRecentPredictions() {
         console.error('Error fetching recent predictions:', error);
     }
 }
-
-// Allow Enter key to connect stream
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('espIpInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            connectToStream();
-        }
-    });
-});

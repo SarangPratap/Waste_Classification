@@ -19,8 +19,8 @@ ENV/
 instance/
 .webassets-cache
 
-# Data files (optional - comment out if you want to commit data)
-# server/data/*.csv
+# Data files
+server/data/*.csv
 
 # IDE
 .idea/

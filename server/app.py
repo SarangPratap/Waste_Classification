@@ -44,8 +44,9 @@ def receive_prediction():
         if len(predictions_list) > 50:
             predictions_list.pop(0)
         
-        # Log to CSV
+        # Log to CSV with correct column order
         df = pd.DataFrame([data])
+        df = df[['timestamp', 'category', 'confidence', 'device_id']]
         df.to_csv(CSV_FILE, mode='a', header=False, index=False)
         
         # Broadcast to all connected clients via WebSocket
