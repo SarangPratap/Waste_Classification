@@ -29,7 +29,7 @@ Open `include/config.h` and update with your network details:
 ```cmd
 ipconfig
 ```
-Look for "IPv4 Address" under your active network adapter.
+Look for "IPv4 Address" under your active network adapter (e.g., `192.168.1.100`).
 
 #### macOS/Linux:
 ```bash
@@ -37,10 +37,9 @@ ifconfig
 # or
 ip addr show
 ```
-Look for `inet` address (e.g., `192.168.1.100`)
+Look for `inet` address under your active network interface (e.g., `inet 192.168.1.100`).
 
-#### Quick Method (All OS):
-Visit [whatismyipaddress.com](https://whatismyipaddress.com/) and look for "Private IP Address"
+**Note:** You need your **local/private IP** address on your network, not your public internet IP. Local addresses typically start with `192.168.x.x`, `10.x.x.x`, or `172.16.x.x` to `172.31.x.x`.
 
 ### 3. Important WiFi Requirements
 

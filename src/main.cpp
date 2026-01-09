@@ -169,18 +169,22 @@ void handleStream(AsyncWebServerRequest *request) {
             }
             
             size_t len = 0;
-            if (index == 0) {
-                len = snprintf((char *)buffer, maxLen,
-                              "--frame\r\n"
-                              "Content-Type: image/jpeg\r\n"
-                              "Content-Length: %u\r\n\r\n",
-                              fb->len);
-            }
             
-            if (len < maxLen && fb->len < (maxLen - len)) {
+            // Write frame header
+            len = snprintf((char *)buffer, maxLen,
+                          "--frame\r\n"
+                          "Content-Type: image/jpeg\r\n"
+                          "Content-Length: %u\r\n\r\n",
+                          fb->len);
+            
+            // Check if frame data fits in remaining buffer
+            if (len + fb->len + 2 <= maxLen) {
                 memcpy(buffer + len, fb->buf, fb->len);
                 len += fb->len;
                 len += snprintf((char *)buffer + len, maxLen - len, "\r\n");
+            } else {
+                // Frame too large for buffer, skip this frame
+                len = 0;
             }
             
             esp_camera_fb_return(fb);
@@ -239,6 +243,14 @@ void setup() {
         while(1) { delay(1000); }
     }
     Serial.println("✓ Camera initialized");
+
+    // ✅ NEW: Allocate snapshot buffer once (reuse throughout application)
+    snapshot_buf = (uint8_t*)malloc(EI_CAMERA_RAW_FRAME_BUFFER_COLS * EI_CAMERA_RAW_FRAME_BUFFER_ROWS * EI_CAMERA_FRAME_BYTE_SIZE);
+    if (!snapshot_buf) {
+        Serial.println("✗ Failed to allocate snapshot buffer!");
+        while(1) { delay(1000); }
+    }
+    Serial.println("✓ Snapshot buffer allocated");
 
     // ✅ NEW: Setup WiFi
     setupWiFi();
@@ -305,18 +317,9 @@ void loop() {
         return;
     }
 
-    // ✅ KEEP: Allocate buffer
-    snapshot_buf = (uint8_t*)malloc(EI_CAMERA_RAW_FRAME_BUFFER_COLS * EI_CAMERA_RAW_FRAME_BUFFER_ROWS * EI_CAMERA_FRAME_BYTE_SIZE);
-
-    if (!snapshot_buf) {
-        Serial.println("Malloc failed");
-        delay(1000);
-        return;
-    }
-
-    // ✅ KEEP: Capture image
+    // ✅ MODIFIED: Capture image (buffer already allocated in setup)
     if (!ei_camera_capture((size_t)EI_CLASSIFIER_INPUT_WIDTH, (size_t)EI_CLASSIFIER_INPUT_HEIGHT, snapshot_buf)) {
-        free(snapshot_buf);
+        Serial.println("Capture failed");
         delay(1000);
         return;
     }
@@ -332,7 +335,6 @@ void loop() {
 
     if (res != EI_IMPULSE_OK) {
         Serial.printf("Classifier failed %d\n", res);
-        free(snapshot_buf);
         delay(1000);
         return;
     }
@@ -363,6 +365,5 @@ void loop() {
     }
 
     Serial.println("---");
-    free(snapshot_buf);
     delay(2000);
 }
