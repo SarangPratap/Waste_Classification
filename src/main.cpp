@@ -178,12 +178,15 @@ void handleStream(AsyncWebServerRequest *request) {
                           fb->len);
             
             // Check if frame data fits in remaining buffer
+            // Note: If frames are consistently too large, consider adjusting
+            // camera quality settings in camera_config.jpeg_quality
             if (len + fb->len + 2 <= maxLen) {
                 memcpy(buffer + len, fb->buf, fb->len);
                 len += fb->len;
                 len += snprintf((char *)buffer + len, maxLen - len, "\r\n");
             } else {
                 // Frame too large for buffer, skip this frame
+                Serial.printf("Frame too large (%u bytes), skipping\n", fb->len);
                 len = 0;
             }
             
@@ -205,7 +208,7 @@ void sendPredictionToBackend(String category, float confidence) {
     
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
-    http.setTimeout(2000);  // 2 second timeout
+    http.setTimeout(1000);  // 1 second timeout to prevent inference delays
     
     StaticJsonDocument<200> doc;
     doc["category"] = category;

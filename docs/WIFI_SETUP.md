@@ -39,7 +39,10 @@ ip addr show
 ```
 Look for `inet` address under your active network interface (e.g., `inet 192.168.1.100`).
 
-**Note:** You need your **local/private IP** address on your network, not your public internet IP. Local addresses typically start with `192.168.x.x`, `10.x.x.x`, or `172.16.x.x` to `172.31.x.x`.
+**Note:** You need your **local/private IP** address on your network, not your public internet IP. Local addresses typically start with:
+- `192.168.x.x` (most common for home networks)
+- `10.x.x.x` (large private networks)
+- `172.16.0.0` to `172.31.255.255` (medium private networks)
 
 ### 3. Important WiFi Requirements
 
