@@ -3,3 +3,17 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+
+# Ignore config with real credentials (use config.h.example instead)
+include/config.h
+
+# Build artifacts
+*.o
+*.a
+*.bin
+*.elf
+
+# Temporary files
+*~
+*.swp
+*.tmp

@@ -1,0 +1,28 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// ⚙️ WiFi Configuration
+// Copy this file to config.h and update with your actual credentials
+// DO NOT commit config.h with real credentials to version control
+
+// Replace with your network credentials
+#define WIFI_SSID "your_wifi_ssid"
+#define WIFI_PASSWORD "your_wifi_password"
+
+// Backend Configuration
+// Replace with your backend server details
+// This is typically your computer's local IP address
+#define BACKEND_HOST "192.168.1.100"  // Your computer's IP address
+#define BACKEND_PORT 5000              // Backend server port
+
+// 💡 Quick Setup:
+// 1. Copy this file: cp config.h.example config.h
+// 2. Edit config.h with your WiFi name and password
+// 3. Find your computer's IP: 
+//    - Windows: ipconfig
+//    - macOS/Linux: ifconfig or ip addr
+// 4. Update BACKEND_HOST with your computer's IP
+//
+// ⚠️ Note: ESP32 only supports 2.4GHz WiFi networks
+
+#endif // CONFIG_H
