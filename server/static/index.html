@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗑️ Waste Classification System</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🗑️ Waste Classification System</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span>Connecting...</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column: Video Stream -->
+            <div class="video-section">
+                <div class="card">
+                    <h2>📹 Live Camera Feed</h2>
+                    <div class="video-container">
+                        <img id="videoStream" src="" alt="Loading camera...">
+                        <div class="video-overlay" id="videoOverlay">
+                            <p>Enter ESP32-CAM IP address below</p>
+                        </div>
+                    </div>
+                    <div class="stream-controls">
+                        <input 
+                            type="text" 
+                            id="espIpInput" 
+                            placeholder="e.g., 192.168.1.50" 
+                            value="">
+                        <button onclick="connectToStream()">Connect Stream</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Predictions -->
+            <div class="predictions-section">
+                <!-- Current Prediction Card -->
+                <div class="card prediction-card" id="predictionCard">
+                    <h2>Current Detection</h2>
+                    <div class="prediction-content">
+                        <div class="prediction-icon" id="predictionIcon">🗑️</div>
+                        <div class="prediction-details">
+                            <h3 class="prediction-category" id="predictionCategory">Waiting for data...</h3>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill"></div>
+                            </div>
+                            <p class="confidence-text" id="confidenceText">0%</p>
+                            <p class="prediction-time" id="predictionTime">No predictions yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Predictions History -->
+                <div class="card history-card">
+                    <h2>📜 Recent History</h2>
+                    <div class="history-list" id="historyList">
+                        <p class="no-data">No predictions yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div class="stats-section">
+            <div class="card stats-card">
+                <h2>📊 Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Classifications</span>
+                        <span class="stat-value" id="statTotal">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Most Common</span>
+                        <span class="stat-value" id="statMostCommon">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Average Confidence</span>
+                        <span class="stat-value" id="statAvgConfidence">0%</span>
+                    </div>
+                </div>
+                <div class="category-distribution" id="categoryDistribution"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
