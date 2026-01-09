@@ -6,7 +6,7 @@
 #define WIFI_PASSWORD "thorsten!!!"
 
 // Backend Server Configuration
-#define BACKEND_HOST "192.168.1.100"  // User's laptop IP
+#define BACKEND_HOST "192.168.6.43"  // User's laptop IP
 #define BACKEND_PORT 5000
 
 // Camera Settings

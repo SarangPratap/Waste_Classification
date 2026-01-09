@@ -172,8 +172,34 @@ void setupWiFi() {
 void handleStream(AsyncWebServerRequest *request) {
     Serial.println("Stream requested");
     
-    AsyncWebServerResponse *response = request->beginResponse(
-        "multipart/x-mixed-replace; boundary=frame"
+    AsyncWebServerResponse *response = request->beginChunkedResponse(
+        "multipart/x-mixed-replace; boundary=frame",
+        [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
+            camera_fb_t *fb = esp_camera_fb_get();
+            if (!fb) {
+                return 0;
+            }
+            
+            size_t len = 0;
+            if (index == 0) {
+                // Write boundary and headers
+                len = snprintf((char *)buffer, maxLen,
+                    "--frame\r\n"
+                    "Content-Type: image/jpeg\r\n"
+                    "Content-Length: %u\r\n\r\n",
+                    fb->len);
+            }
+            
+            // Copy frame data
+            if (len < maxLen && index < fb->len) {
+                size_t copy_len = min(maxLen - len, fb->len - index);
+                memcpy(buffer + len, fb->buf + index, copy_len);
+                len += copy_len;
+            }
+            
+            esp_camera_fb_return(fb);
+            return len;
+        }
     );
     
     request->send(response);
