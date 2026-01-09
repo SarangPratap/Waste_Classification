@@ -164,6 +164,39 @@ body {
     transform: scale(1.05);
 }
 
+.stream-help {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(30, 144, 255, 0.1);
+    border-left: 3px solid #1E90FF;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.stream-help p {
+    margin: 0 0 10px 0;
+    color: #87CEEB;
+}
+
+.stream-help ol {
+    margin: 0;
+    padding-left: 20px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.stream-help ol li {
+    margin: 5px 0;
+    line-height: 1.5;
+}
+
+.stream-help code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: #FFD700;
+}
+
 /* Predictions Section */
 .predictions-section {
     grid-column: 2;

@@ -95,7 +95,29 @@ MJPEG Stream: http://192.168.1.50/stream
 ==========================================
 ```
 
-**Note the IP address** - you'll need it to connect the video stream.
+**📝 IMPORTANT: Note the IP address (e.g., 192.168.1.50)** - you'll need it to connect the video stream in the dashboard.
+
+**💡 How to Find ESP32-CAM IP Address:**
+
+If you missed the IP address in the startup output:
+
+1. **Using Serial Monitor:**
+   - Type `status` command and press Enter
+   - The IP address will be displayed in the output
+   
+2. **Using Your Router:**
+   - Log into your WiFi router's admin panel
+   - Look for connected devices list
+   - Find device named "ESP32-CAM" or similar
+   
+3. **Using Network Scanner:**
+   - Use tools like `arp -a` (Windows/Mac/Linux)
+   - Use mobile apps like "Fing" or "Network Scanner"
+   - Look for devices with manufacturer "Espressif"
+
+4. **Alternative - Use mDNS (if configured):**
+   - Access via `http://esp32cam.local/stream`
+   - (This requires mDNS to be enabled in the ESP32 code)
 
 ### Step 5: Install Python Dependencies
 
