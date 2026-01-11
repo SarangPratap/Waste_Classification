@@ -1,4 +1,7 @@
 // Category colors and icons
+let espStreamStatus = 'disconnected'; // Stream status tracking
+let snapshotTimer = null; // polling timer for snapshot-based streaming
+
 const categoryColors = {
     'battery': '#FFD700',
     'biological': '#32CD32',
@@ -23,6 +26,15 @@ const categoryIcons = {
     'shoe': '👟'
 };
 
+// Restore saved ESP IP and optionally auto-connect
+document.addEventListener('DOMContentLoaded', () => {
+    const savedIp = localStorage.getItem('esp32cam_ip');
+    const ipInput = document.getElementById('espIpInput');
+    if (savedIp && ipInput) {
+        ipInput.value = savedIp;
+    }
+});
+
 // WebSocket connection
 const socket = io(window.location.origin);
 
@@ -43,6 +55,7 @@ socket.on('new_prediction', (data) => {
     updatePredictionCard(data);
     addToHistory(data);
     updateStats();
+    updateStreamStatus('detected');
 });
 
 // Update connection status indicator
@@ -201,25 +214,94 @@ function connectToStream() {
         return;
     }
     
-    const streamUrl = `http://${espIp}/stream`;
+    const snapshotUrl = (ts) => `http://${espIp}/snapshot?t=${ts}`;
     const videoStream = document.getElementById('videoStream');
     const videoOverlay = document.getElementById('videoOverlay');
     
-    videoStream.src = streamUrl;
-    videoOverlay.classList.add('hidden');
+    // Set up stream directly
+    updateStreamStatus('connecting');
     
-    // Handle errors
+    // Clear any previous polling timer
+    if (snapshotTimer) {
+        clearInterval(snapshotTimer);
+        snapshotTimer = null;
+    }
+
+    // Start polling snapshots (~10 FPS)
+    const fps = 15; // increase snapshot polling to ~15 FPS
+    const interval = Math.max(40, Math.floor(1000 / fps));
+    
+    // First frame handler to hide overlay when an image loads
+    videoStream.onload = () => {
+        if (espStreamStatus !== 'streaming') {
+            console.log('✅ Snapshot stream connected');
+        }
+        videoOverlay.classList.add('hidden');
+        updateStreamStatus('streaming');
+    };
+
+    // Error handler: show overlay and stop polling
     videoStream.onerror = () => {
         videoOverlay.classList.remove('hidden');
-        videoOverlay.innerHTML = '<p>❌ Failed to connect to stream<br>Check IP address and network</p>';
+        videoOverlay.innerHTML = '<p>❌ Failed to fetch snapshot<br>Check IP address and network</p>';
+        updateStreamStatus('disconnected');
+        if (snapshotTimer) {
+            clearInterval(snapshotTimer);
+            snapshotTimer = null;
+        }
     };
-    
-    videoStream.onload = () => {
-        console.log('✅ Stream connected');
-    };
+
+    // Kick off immediately, then poll
+    videoStream.src = snapshotUrl(Date.now());
+    videoOverlay.classList.add('hidden');
+    snapshotTimer = setInterval(() => {
+        // Bust cache with timestamp
+        videoStream.src = snapshotUrl(Date.now());
+    }, interval);
     
     // Save IP to localStorage
     localStorage.setItem('esp32cam_ip', espIp);
+    
+    // Start polling ESP32 status
+    pollEsp32Status(espIp);
+}
+
+// Poll ESP32 status every 2 seconds
+function pollEsp32Status(espIp) {
+    setInterval(() => {
+        fetch(`http://${espIp}/status`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.status) {
+                    updateStreamStatus(data.status === 'running' ? 'streaming' : 'paused');
+                }
+            })
+            .catch(() => {
+                // Silently ignore errors - stream might still work
+            });
+    }, 2000);
+}
+
+// Update stream status display
+function updateStreamStatus(status) {
+    const videoOverlay = document.getElementById('videoOverlay');
+    espStreamStatus = status;
+    
+    const statusMessages = {
+        'disconnected': '📡 Disconnected<br>Enter IP and click Connect',
+        'connecting': '⏳ Connecting to ESP32...',
+        'connected': '🔌 Connected<br>Waiting for stream...',
+        'streaming': '🎥 STREAMING LIVE',
+        'predicting': '🤖 ANALYZING...',
+        'detected': '✓ DETECTED'
+    };
+    
+    if (status === 'streaming' || status === 'predicting' || status === 'detected') {
+        videoOverlay.classList.add('hidden');
+    } else {
+        videoOverlay.classList.remove('hidden');
+        videoOverlay.innerHTML = `<p>${statusMessages[status] || statusMessages['disconnected']}</p>`;
+    }
 }
 
 // Format time ago

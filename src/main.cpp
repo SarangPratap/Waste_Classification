@@ -46,6 +46,15 @@ static uint8_t *snapshot_buf = NULL;
 bool inference_running = true;
 unsigned long lastInferenceTime = 0;
 
+// Classification results for display
+String lastCategory = "Waiting...";
+float lastConfidence = 0.0;
+unsigned long lastClassificationTime = 0;
+
+// Stream management
+static uint8_t active_streams = 0;
+const uint8_t MAX_STREAMS = 2;  // Limit concurrent streams
+
 AsyncWebServer server(80);
 
 /* Camera Configuration */
@@ -72,9 +81,10 @@ static camera_config_t camera_config = {
     .pixel_format = PIXFORMAT_JPEG,
     .frame_size = FRAMESIZE_QVGA,
     .jpeg_quality = CAMERA_QUALITY,
-    .fb_count = 1,
+    .fb_count = 2,
     .fb_location = CAMERA_FB_IN_PSRAM,
-    .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
+    // Use latest frame to improve streaming responsiveness
+    .grab_mode = CAMERA_GRAB_LATEST,
 };
 
 /* Camera Initialization */
@@ -168,41 +178,43 @@ void setupWiFi() {
     }
 }
 
-/* MJPEG Streaming Handler */
-void handleStream(AsyncWebServerRequest *request) {
-    Serial.println("Stream requested");
+/* Camera Snapshot Handler (Simple, Working Approach) */
+void handleSnapshot(AsyncWebServerRequest *request) {
+    camera_fb_t * fb = esp_camera_fb_get();
+    if(!fb){
+        request->send(503, "text/plain", "Camera capture failed");
+        return;
+    }
     
-    AsyncWebServerResponse *response = request->beginChunkedResponse(
-        "multipart/x-mixed-replace; boundary=frame",
-        [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
-            camera_fb_t *fb = esp_camera_fb_get();
-            if (!fb) {
-                return 0;
-            }
-            
-            size_t len = 0;
-            if (index == 0) {
-                // Write boundary and headers
-                len = snprintf((char *)buffer, maxLen,
-                    "--frame\r\n"
-                    "Content-Type: image/jpeg\r\n"
-                    "Content-Length: %u\r\n\r\n",
-                    fb->len);
-            }
-            
-            // Copy frame data
-            if (len < maxLen && index < fb->len) {
-                size_t copy_len = min(maxLen - len, fb->len - index);
-                memcpy(buffer + len, fb->buf + index, copy_len);
-                len += copy_len;
-            }
-            
-            esp_camera_fb_return(fb);
-            return len;
-        }
+    AsyncWebServerResponse *response = request->beginResponse_P(
+        200,
+        "image/jpeg",
+        fb->buf,
+        fb->len
     );
     
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    response->addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    
     request->send(response);
+    esp_camera_fb_return(fb);
+    
+    Serial.println("📷 Snapshot served");
+}
+
+/* MJPEG Stream - iframe/multipart approach */
+void handleStream(AsyncWebServerRequest *request) {
+    request->send(200, "text/html", 
+        "<html><body style='margin:0'>"
+        "<img id='stream' style='width:100%; height:100%; object-fit:contain'>"
+        "<script>"
+        "function refreshImage(){"
+        "  document.getElementById('stream').src='/snapshot?t='+Date.now();"
+        "  setTimeout(refreshImage, 100);"  // 10 FPS
+        "}"
+        "refreshImage();"
+        "</script>"
+        "</body></html>");
 }
 
 /* Send Prediction to Flask Backend */
@@ -257,8 +269,11 @@ void setupWebServer() {
         request->send(200, "text/html", html);
     });
     
-    // Stream endpoint
+    // Stream endpoint (Motion JPEG polling)
     server.on("/stream", HTTP_GET, handleStream);
+    
+    // Snapshot endpoint (single JPEG image)
+    server.on("/snapshot", HTTP_GET, handleSnapshot);
     
     // Status endpoint
     server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -267,10 +282,31 @@ void setupWebServer() {
         doc["wifi"] = WiFi.status() == WL_CONNECTED;
         doc["ip"] = WiFi.localIP().toString();
         doc["uptime"] = millis();
+        doc["inference_interval"] = INFERENCE_INTERVAL;
+        doc["last_category"] = lastCategory;
+        doc["last_confidence"] = lastConfidence;
+        doc["last_classification_time"] = lastClassificationTime;
         
         String json;
         serializeJson(doc, json);
-        request->send(200, "application/json", json);
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", json);
+        response->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(response);
+    });
+    
+    // Latest prediction endpoint
+    server.on("/api/lastprediction", HTTP_GET, [](AsyncWebServerRequest *request){
+        StaticJsonDocument<256> doc;
+        doc["category"] = lastCategory;
+        doc["confidence"] = lastConfidence;
+        doc["timestamp"] = lastClassificationTime;
+        doc["time_ago_ms"] = (millis() - lastClassificationTime);
+        
+        String json;
+        serializeJson(doc, json);
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", json);
+        response->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(response);
     });
     
     server.begin();
@@ -459,6 +495,11 @@ void loop() {
                      best_category.c_str(), 
                      best_confidence * 100);
         
+        // Update global for stream display
+        lastCategory = best_category;
+        lastConfidence = best_confidence;
+        lastClassificationTime = millis();
+        
         // Send to web dashboard
         sendPredictionToBackend(best_category, best_confidence);
         
@@ -474,6 +515,11 @@ void loop() {
                      best_confidence * 100, 
                      CONFIDENCE_THRESHOLD * 100);
         Serial.println("Please reposition the item or improve lighting");
+        
+        // Update global even for low confidence
+        lastCategory = "Low confidence";
+        lastConfidence = best_confidence;
+        lastClassificationTime = millis();
     }
 
     Serial.println("---\n");
