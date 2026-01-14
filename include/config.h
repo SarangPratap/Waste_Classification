@@ -6,12 +6,12 @@
 #define WIFI_PASSWORD "tfru4008"
 
 // Backend Server Configuration
-#define BACKEND_HOST "172.25.162.17"  // User's laptop IP
+#define BACKEND_HOST "10.208.253.17"  // User's laptop IP
 #define BACKEND_PORT 5000
 
 // Camera Settings
 // Increase value for faster streaming (lower JPEG quality)
-#define CAMERA_QUALITY 20  // 0-63, lower means higher quality
+#define CAMERA_QUALITY 10  // 0-63, lower means higher quality
 #define INFERENCE_INTERVAL 3000  // 3 seconds
 
 // LED Pins
