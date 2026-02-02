@@ -1,0 +1,230 @@
+2026-01-28 23:37:26,567 [INFO] Connecting to http://192.168.1.100/stream
+2026-01-28 23:37:26,567 [INFO] Dashboard ready
+2026-01-28 23:37:26,598 [INFO] HTTP Server on port 5000
+2026-01-28 23:38:49,289 [INFO] Connecting to http://192.168.1.100/stream
+2026-01-28 23:38:49,289 [INFO] Dashboard ready
+2026-01-28 23:38:49,297 [INFO] HTTP Server on port 5000
+2026-01-29 00:40:29,083 [INFO] Connecting to http://192.168.1.100/stream
+2026-01-29 00:40:29,083 [INFO] Dashboard ready
+2026-01-29 00:40:29,112 [INFO] HTTP Server on port 5000
+2026-01-29 00:42:39,710 [INFO] Connecting to http://192.168.1.100/stream
+2026-01-29 00:42:39,710 [INFO] Dashboard ready
+2026-01-29 00:42:39,717 [INFO] HTTP Server on port 5000
+2026-01-29 01:08:35,789 [INFO] Video: Connecting to http://192.168.1.XX:81/stream
+2026-01-29 01:08:35,789 [INFO] Dashboard ready
+2026-01-29 01:08:35,815 [INFO] HTTP Server on port 5000
+2026-01-29 01:10:30,194 [INFO] Video: Connecting to http://192.168.1.XX:81/stream
+2026-01-29 01:10:30,194 [INFO] Dashboard ready
+2026-01-29 01:10:30,202 [INFO] HTTP Server on port 5000
+2026-01-29 01:10:30,404 [ERROR] Video error: Cannot open stream at http://192.168.1.XX:81/stream
+2026-01-29 01:10:32,565 [ERROR] Video error: Cannot open stream at http://192.168.1.XX:81/stream
+2026-01-29 01:10:34,706 [ERROR] Video error: Cannot open stream at http://192.168.1.XX:81/stream
+2026-01-29 01:10:36,869 [ERROR] Video error: Cannot open stream at http://192.168.1.XX:81/stream
+2026-01-29 01:10:39,015 [ERROR] Video error: Cannot open stream at http://192.168.1.XX:81/stream
+2026-02-02 08:22:27,499 [INFO] Video: Connecting to snapshot endpoint http://192.168.1.XX:80/snapshot
+2026-02-02 08:22:27,500 [INFO] Dashboard ready
+2026-02-02 08:22:27,508 [INFO] HTTP Server on port 5000
+2026-02-02 18:36:00,339 [INFO] Video: Attempting MJPEG stream http://192.168.1.XX:80/stream
+2026-02-02 18:36:00,339 [INFO] Dashboard ready
+2026-02-02 18:36:00,365 [INFO] HTTP Server on port 5000
+2026-02-02 18:36:00,673 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:00,681 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:03,871 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:03,871 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:07,041 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:07,041 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:10,209 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:10,209 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:13,378 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:13,378 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:16,521 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:16,521 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:19,675 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:19,675 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:22,811 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:22,811 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:26,011 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:26,012 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:29,187 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:29,188 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:32,332 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:32,333 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:35,464 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:35,465 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:38,616 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:38,616 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:41,772 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:41,773 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:44,915 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:44,915 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:48,083 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:48,084 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:51,222 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:51,222 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:56,219 [INFO] Video: Attempting MJPEG stream http://192.168.1.XX:80/stream
+2026-02-02 18:36:56,219 [INFO] Dashboard ready
+2026-02-02 18:36:56,225 [INFO] HTTP Server on port 5000
+2026-02-02 18:36:56,434 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:56,441 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:36:59,611 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:36:59,611 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:37:02,777 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:37:02,779 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:37:05,938 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:37:05,939 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:37:28,993 [INFO] Video: Attempting MJPEG stream http://192.168.1.XX:80/stream
+2026-02-02 18:37:28,993 [INFO] Dashboard ready
+2026-02-02 18:37:29,000 [INFO] HTTP Server on port 5000
+2026-02-02 18:37:29,187 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:37:29,193 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:37:32,372 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:37:32,373 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:37:59,223 [INFO] Video: Attempting MJPEG stream http://192.168.1.XX:80/stream
+2026-02-02 18:37:59,223 [INFO] Dashboard ready
+2026-02-02 18:37:59,230 [INFO] HTTP Server on port 5000
+2026-02-02 18:37:59,410 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:37:59,414 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:31,868 [INFO] Video: Attempting MJPEG stream http://192.168.1.XX:80/stream
+2026-02-02 18:38:31,868 [INFO] Dashboard ready
+2026-02-02 18:38:31,874 [INFO] HTTP Server on port 5000
+2026-02-02 18:38:32,114 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:32,121 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:35,275 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:35,275 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:38,439 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:38,439 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:41,589 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:41,590 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:44,736 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:44,736 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:47,872 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:47,872 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:51,082 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:51,082 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:54,216 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:54,216 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:38:57,362 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:38:57,363 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:00,510 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:00,510 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:03,720 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:03,720 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:06,851 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:06,851 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:10,013 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:10,013 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:13,142 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:13,143 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:16,329 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:16,329 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:19,468 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:19,469 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:22,653 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:22,653 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:25,781 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:25,781 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:28,925 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:28,925 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:32,066 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:32,066 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:35,239 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:35,239 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:38,381 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:38,381 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:41,535 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:41,535 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:39:44,686 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:39:44,686 [INFO] Video: Using snapshot polling http://192.168.1.XX:80/snapshot
+2026-02-02 18:44:51,829 [INFO] Video: Attempting MJPEG stream http://REPLACE_WITH_ESP32_IP:80/stream
+2026-02-02 18:44:51,829 [INFO] Dashboard ready
+2026-02-02 18:44:51,838 [INFO] HTTP Server on port 5000
+2026-02-02 18:44:56,690 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:44:56,697 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:45:04,934 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:45:04,934 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:45:13,153 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:45:13,153 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:45:21,338 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:45:21,339 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:45:29,534 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:45:29,535 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:45:37,716 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:45:37,716 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:45:45,894 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:45:45,895 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:45:54,081 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:45:54,081 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:46:02,262 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:46:02,262 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:46:10,426 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:46:10,427 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:46:18,628 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:46:18,628 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:46:26,792 [INFO] Video: Attempting MJPEG stream http://REPLACE_WITH_ESP32_IP:80/stream
+2026-02-02 18:46:26,792 [INFO] Dashboard ready
+2026-02-02 18:46:26,800 [INFO] HTTP Server on port 5000
+2026-02-02 18:46:31,595 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:46:31,602 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:46:39,824 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:46:39,824 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:46:48,037 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:46:48,039 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:46:56,255 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:46:56,257 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:47:04,443 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:47:04,443 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:47:12,616 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:47:12,617 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:47:20,823 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:47:20,823 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:47:29,048 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:47:29,048 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:47:37,269 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:47:37,269 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:47:45,440 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:47:45,440 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:47:53,629 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:47:53,629 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:48:01,826 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:48:01,826 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:48:10,018 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:48:10,018 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:48:18,215 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 18:48:18,215 [INFO] Video: Using snapshot polling http://REPLACE_WITH_ESP32_IP:80/snapshot
+2026-02-02 18:48:24,542 [INFO] Video: Attempting MJPEG stream http://10.111.150.217:80/stream
+2026-02-02 18:48:24,542 [INFO] Dashboard ready
+2026-02-02 18:48:24,553 [INFO] HTTP Server on port 5000
+2026-02-02 18:50:19,838 [INFO] Video: Attempting MJPEG stream http://10.111.150.217:80/stream
+2026-02-02 18:50:19,838 [INFO] Dashboard ready
+2026-02-02 18:50:19,845 [INFO] HTTP Server on port 5000
+2026-02-02 18:50:46,699 [INFO] Video: Attempting MJPEG stream http://10.111.150.217:80/stream
+2026-02-02 18:50:46,699 [INFO] Dashboard ready
+2026-02-02 18:50:46,706 [INFO] HTTP Server on port 5000
+2026-02-02 18:59:52,209 [INFO] Video: Attempting MJPEG stream http://10.111.150.217:80/stream
+2026-02-02 18:59:52,209 [INFO] Dashboard ready
+2026-02-02 18:59:52,218 [INFO] HTTP Server on port 5000
+2026-02-02 19:00:26,180 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:00:26,186 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:00:59,425 [ERROR] Snapshot error: timed out
+2026-02-02 19:01:05,101 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:01:05,101 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:01:22,065 [ERROR] Snapshot error: timed out
+2026-02-02 19:01:29,425 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:01:29,425 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:01:43,504 [ERROR] Snapshot error: timed out
+2026-02-02 19:01:48,620 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:01:48,620 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:01:57,442 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:01:57,443 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:02:07,614 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:02:07,616 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:02:16,210 [ERROR] Snapshot error: timed out
+2026-02-02 19:02:21,569 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:02:21,570 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:02:27,748 [ERROR] Snapshot error: timed out
+2026-02-02 19:02:39,415 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:02:39,415 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:02:47,927 [ERROR] Snapshot error: <urlopen error timed out>
+2026-02-02 19:03:00,406 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
+2026-02-02 19:03:00,406 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
+2026-02-02 19:03:16,954 [ERROR] Snapshot error: timed out

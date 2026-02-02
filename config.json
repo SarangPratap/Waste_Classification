@@ -1,0 +1,10 @@
+{
+  "esp32_ip": "10.111.150.217",
+  "stream_port": 80,
+  "http_port": 5000,
+  "confidence_threshold": 0.6,
+  "window_width": 1400,
+  "window_height": 900,
+  "enable_scanlines": true,
+  "max_history": 20
+}

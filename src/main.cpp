@@ -1,70 +1,64 @@
-/* Edge Impulse + WiFi + Web Dashboard Integration */
+/* Edge Impulse + Arcade Dashboard - Working Version for PlatformIO */
 #include <Arduino.h>
 #include <WiFi.h>
-#include <ESPAsyncWebServer.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-
-// Edge Impulse Model (USER MUST INSTALL THIS LIBRARY FROM EDGE IMPULSE)
+#include <ESPAsyncWebServer.h>
 #include <Waste_classification_inferencing.h>
 #include "edge-impulse-sdk/dsp/image/image.hpp"
 #include "esp_camera.h"
 
-// Configuration
-#include "config.h" 
+/* Configuration ---------------------------------------------------------- */
+#define WIFI_SSID "SARANG's Galaxy S22+"
+#define WIFI_PASSWORD "tfru4008"
+#define BACKEND_HOST "10.111.150.17"  // Your PC IP running Arcade
+#define BACKEND_PORT 5000
 
-/* Camera Model Configuration */
-#define CAMERA_MODEL_AI_THINKER
+/* Hardware Defines ------------------------------------------------------- */
+#define STATUS_LED 4                   // GPIO4 onboard LED
+#define CAMERA_QUALITY 12              // JPEG quality 0-63, lower is better
+#define CONFIDENCE_THRESHOLD 0.6       // 60% confidence threshold
+#define INFERENCE_INTERVAL 3000        // 3 seconds between inferences (captures image & detects)
 
-#if defined(CAMERA_MODEL_AI_THINKER)
-  #define PWDN_GPIO_NUM     32
-  #define RESET_GPIO_NUM    -1
-  #define XCLK_GPIO_NUM      0
-  #define SIOD_GPIO_NUM     26
-  #define SIOC_GPIO_NUM     27
-  
-  #define Y9_GPIO_NUM       35
-  #define Y8_GPIO_NUM       34
-  #define Y7_GPIO_NUM       39
-  #define Y6_GPIO_NUM       36
-  #define Y5_GPIO_NUM       21
-  #define Y4_GPIO_NUM       19
-  #define Y3_GPIO_NUM       18
-  #define Y2_GPIO_NUM        5
-  #define VSYNC_GPIO_NUM    25
-  #define HREF_GPIO_NUM     23
-  #define PCLK_GPIO_NUM     22
-#endif
+/* Camera Pins ------------------------------------------------------------ */
+#define PWDN_GPIO_NUM     32
+#define RESET_GPIO_NUM    -1
+#define XCLK_GPIO_NUM      0
+#define SIOD_GPIO_NUM     26
+#define SIOC_GPIO_NUM     27
+#define Y9_GPIO_NUM       35
+#define Y8_GPIO_NUM       34
+#define Y7_GPIO_NUM       39
+#define Y6_GPIO_NUM       36
+#define Y5_GPIO_NUM       21
+#define Y4_GPIO_NUM       19
+#define Y3_GPIO_NUM       18
+#define Y2_GPIO_NUM        5
+#define VSYNC_GPIO_NUM    25
+#define HREF_GPIO_NUM     23
+#define PCLK_GPIO_NUM     22
 
-/* Constants */
-#define EI_CAMERA_RAW_FRAME_BUFFER_COLS           320
-#define EI_CAMERA_RAW_FRAME_BUFFER_ROWS           240
-#define EI_CAMERA_FRAME_BYTE_SIZE                 3
+#define EI_CAMERA_RAW_FRAME_BUFFER_COLS  320
+#define EI_CAMERA_RAW_FRAME_BUFFER_ROWS  240
 
-/* Global Variables */
+/* Global Variables ------------------------------------------------------- */
 static bool is_initialised = false;
 static uint8_t *snapshot_buf = NULL;
 bool inference_running = true;
 unsigned long lastInferenceTime = 0;
-
-// Classification results for display
 String lastCategory = "Waiting...";
 float lastConfidence = 0.0;
-unsigned long lastClassificationTime = 0;
 
-// Stream management
-static uint8_t active_streams = 0;
-const uint8_t MAX_STREAMS = 2;  // Limit concurrent streams
-
+// Web server on port 80 for video streaming
 AsyncWebServer server(80);
 
-/* Camera Configuration */
+/* Camera Configuration --------------------------------------------------- */
 static camera_config_t camera_config = {
     .pin_pwdn = PWDN_GPIO_NUM,
     .pin_reset = RESET_GPIO_NUM,
     .pin_xclk = XCLK_GPIO_NUM,
-    .pin_sccb_sda = SIOD_GPIO_NUM,      // FIXED: sccb not sscb
-    .pin_sccb_scl = SIOC_GPIO_NUM,      // FIXED: sccb not sscb
+    .pin_sccb_sda = SIOD_GPIO_NUM,
+    .pin_sccb_scl = SIOC_GPIO_NUM,
     .pin_d7 = Y9_GPIO_NUM,
     .pin_d6 = Y8_GPIO_NUM,
     .pin_d5 = Y7_GPIO_NUM,
@@ -82,13 +76,12 @@ static camera_config_t camera_config = {
     .pixel_format = PIXFORMAT_JPEG,
     .frame_size = FRAMESIZE_QVGA,
     .jpeg_quality = CAMERA_QUALITY,
-    .fb_count = 2,
+    .fb_count = 1,
     .fb_location = CAMERA_FB_IN_PSRAM,
-    // Use latest frame to improve streaming responsiveness
-    .grab_mode = CAMERA_GRAB_LATEST,
+    .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
 };
 
-/* Camera Initialization */
+/* Camera Functions ------------------------------------------------------- */
 bool ei_camera_init(void) {
     if (is_initialised) return true;
 
@@ -112,7 +105,6 @@ void ei_camera_deinit(void) {
     is_initialised = false;
 }
 
-/* Camera Capture */
 bool ei_camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf) {
     camera_fb_t *fb = esp_camera_fb_get();
     if (!fb) {
@@ -127,11 +119,9 @@ bool ei_camera_capture(uint32_t img_width, uint32_t img_height, uint8_t *out_buf
         Serial.println("Conversion failed");
         return false;
     }
-    
     return true;
 }
 
-/* Edge Impulse Data Callback */
 static int ei_camera_get_data(size_t offset, size_t length, float *out_ptr) {
     size_t pixel_ix = offset * 3;
     size_t bytes_left = length;
@@ -148,7 +138,129 @@ static int ei_camera_get_data(size_t offset, size_t length, float *out_ptr) {
     return 0;
 }
 
-/* WiFi Setup */
+/* Arcade Dashboard Integration ------------------------------------------- */
+void sendPredictionToBackend(String category, float confidence) {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("WiFi not connected, skipping backend");
+        return;
+    }
+    
+    HTTPClient http;
+    String url = "http://" + String(BACKEND_HOST) + ":" + String(BACKEND_PORT) + "/api/prediction";
+    
+    http.begin(url);
+    http.addHeader("Content-Type", "application/json");
+    http.setTimeout(3000);
+    
+    JsonDocument doc;
+    doc["category"] = category;
+    doc["confidence"] = confidence;
+    doc["device_id"] = "ESP32-CAM-001";
+    
+    String jsonString;
+    serializeJson(doc, jsonString);
+    
+    int httpCode = http.POST(jsonString);
+    
+    if (httpCode > 0) {
+        Serial.printf("✓ Sent to Arcade: HTTP %d\n", httpCode);
+    } else {
+        Serial.printf("✗ Send failed: %s\n", http.errorToString(httpCode).c_str());
+    }
+    
+    http.end();
+}
+
+/* Web Server for Video Streaming ----------------------------------------- */
+void handleSnapshot(AsyncWebServerRequest *request) {
+    camera_fb_t *fb = esp_camera_fb_get();
+    if (!fb) {
+        request->send(503, "text/plain", "Camera capture failed");
+        return;
+    }
+    
+    AsyncWebServerResponse *response = request->beginResponse_P(
+        200, "image/jpeg", fb->buf, fb->len
+    );
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    response->addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    request->send(response);
+    esp_camera_fb_return(fb);
+}
+
+void handleStream(AsyncWebServerRequest *request) {
+    // MJPEG streaming using chunked response
+    AsyncWebServerResponse *response = request->beginChunkedResponse(
+        "multipart/x-mixed-replace; boundary=frame",
+        [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
+            camera_fb_t *fb = esp_camera_fb_get();
+            if (!fb) return 0;
+            
+            size_t len = 0;
+            // Frame header
+            len = snprintf((char *)buffer, maxLen,
+                "--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n",
+                fb->len);
+            
+            // Check if frame fits in buffer
+            if (len + fb->len + 2 <= maxLen) {
+                memcpy(buffer + len, fb->buf, fb->len);
+                len += fb->len;
+                len += snprintf((char *)buffer + len, maxLen - len, "\r\n");
+            } else {
+                len = 0;  // Frame too large, skip
+            }
+            
+            esp_camera_fb_return(fb);
+            return len;
+        }
+    );
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    request->send(response);
+}
+
+void setupWebServer() {
+    // Root page
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+        String html = "<html><head><title>ESP32-CAM</title></head><body>";
+        html += "<h1>ESP32-CAM Waste Classifier</h1>";
+        html += "<p>Status: " + String(inference_running ? "Running" : "Paused") + "</p>";
+        html += "<p>Last: " + lastCategory + " (" + String(lastConfidence * 100, 1) + "%)</p>";
+        html += "<p><a href='/stream'>MJPEG Stream</a></p>";
+        html += "<p><a href='/snapshot'>Snapshot</a></p>";
+        html += "<p>Arcade Dashboard: http://" + String(BACKEND_HOST) + ":" + String(BACKEND_PORT) + "</p>";
+        html += "<hr><img src='/stream' width='640'>";
+        html += "</body></html>";
+        request->send(200, "text/html", html);
+    });
+    
+    // Snapshot endpoint (single JPEG)
+    server.on("/snapshot", HTTP_GET, handleSnapshot);
+    
+    // Stream endpoint (MJPEG)
+    server.on("/stream", HTTP_GET, handleStream);
+    
+    // Status endpoint (JSON)
+    server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+        JsonDocument doc;
+        doc["status"] = inference_running ? "running" : "paused";
+        doc["wifi"] = WiFi.status() == WL_CONNECTED;
+        doc["ip"] = WiFi.localIP().toString();
+        doc["category"] = lastCategory;
+        doc["confidence"] = lastConfidence;
+        
+        String json;
+        serializeJson(doc, json);
+        
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", json);
+        response->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(response);
+    });
+    
+    server.begin();
+    Serial.println("✓ Web server started on port 80");
+}
+
 void setupWiFi() {
     Serial.println("\n=== WiFi Setup ===");
     Serial.printf("Connecting to: %s\n", WIFI_SSID);
@@ -168,165 +280,33 @@ void setupWiFi() {
         Serial.println("\n✓ WiFi Connected!");
         Serial.print("IP Address: ");
         Serial.println(WiFi.localIP());
-        Serial.print("Stream URL: http://");
-        Serial.print(WiFi.localIP());
-        Serial.println("/stream");
+        Serial.printf("Stream: http://%s:81 (for Arcade)\n", WiFi.localIP().toString().c_str());
+        Serial.printf("Dashboard: http://%s:%d\n", BACKEND_HOST, BACKEND_PORT);
         digitalWrite(STATUS_LED, HIGH);
     } else {
-        Serial.println("\n✗ WiFi Connection Failed");
-        Serial.println("Continuing without WiFi...");
+        Serial.println("\n✗ WiFi Failed - running offline");
         digitalWrite(STATUS_LED, LOW);
     }
 }
 
-/* Camera Snapshot Handler (Simple, Working Approach) */
-void handleSnapshot(AsyncWebServerRequest *request) {
-    camera_fb_t * fb = esp_camera_fb_get();
-    if(!fb){
-        request->send(503, "text/plain", "Camera capture failed");
-        return;
-    }
-    
-    AsyncWebServerResponse *response = request->beginResponse_P(
-        200,
-        "image/jpeg",
-        fb->buf,
-        fb->len
-    );
-    
-    response->addHeader("Access-Control-Allow-Origin", "*");
-    response->addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    
-    request->send(response);
-    esp_camera_fb_return(fb);
-    
-    Serial.println("📷 Snapshot served");
-}
-
-/* MJPEG Stream - iframe/multipart approach */
-void handleStream(AsyncWebServerRequest *request) {
-    request->send(200, "text/html", 
-        "<html><body style='margin:0'>"
-        "<img id='stream' style='width:100%; height:100%; object-fit:contain'>"
-        "<script>"
-        "function refreshImage(){"
-        "  document.getElementById('stream').src='/snapshot?t='+Date.now();"
-        "  setTimeout(refreshImage, 100);"  // 10 FPS
-        "}"
-        "refreshImage();"
-        "</script>"
-        "</body></html>");
-}
-
-/* Send Prediction to Flask Backend */
-void sendPredictionToBackend(String category, float confidence) {
-    if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("WiFi not connected, skipping backend send");
-        return;
-    }
-    
-    HTTPClient http;
-    String url = "http://" + String(BACKEND_HOST) + ":" + String(BACKEND_PORT) + "/api/prediction";
-    
-    http.begin(url);
-    http.addHeader("Content-Type", "application/json");
-    http.setTimeout(3000);
-    
-    StaticJsonDocument<256> doc;
-    doc["category"] = category;
-    doc["confidence"] = confidence;
-    doc["device_id"] = "ESP32-CAM-001";
-    doc["timestamp"] = millis();
-    
-    String jsonString;
-    serializeJson(doc, jsonString);
-    
-    int httpCode = http.POST(jsonString);
-    
-    if (httpCode > 0) {
-        Serial.printf("✓ Sent to backend: %d\n", httpCode);
-        if (httpCode == 200) {
-            String response = http.getString();
-            Serial.println("Response: " + response);
-        }
-    } else {
-        Serial.printf("✗ Backend send failed: %s\n", http.errorToString(httpCode).c_str());
-    }
-    
-    http.end();
-}
-
-/* Web Server Setup */
-void setupWebServer() {
-    // Root endpoint
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        String html = "<html><body>";
-        html += "<h1>ESP32-CAM Waste Classifier</h1>";
-        html += "<p>Status: " + String(inference_running ? "Running" : "Paused") + "</p>";
-        html += "<p>WiFi: " + WiFi.localIP().toString() + "</p>";
-        html += "<p><a href='/stream'>View Stream</a></p>";
-        html += "<p>Dashboard: http://" + String(BACKEND_HOST) + ":" + String(BACKEND_PORT) + "</p>";
-        html += "</body></html>";
-        request->send(200, "text/html", html);
-    });
-    
-    // Stream endpoint (Motion JPEG polling)
-    server.on("/stream", HTTP_GET, handleStream);
-    
-    // Snapshot endpoint (single JPEG image)
-    server.on("/snapshot", HTTP_GET, handleSnapshot);
-    
-    // Status endpoint
-    server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request){
-        StaticJsonDocument<256> doc;
-        doc["status"] = inference_running ? "running" : "paused";
-        doc["wifi"] = WiFi.status() == WL_CONNECTED;
-        doc["ip"] = WiFi.localIP().toString();
-        doc["uptime"] = millis();
-        doc["inference_interval"] = INFERENCE_INTERVAL;
-        doc["last_category"] = lastCategory;
-        doc["last_confidence"] = lastConfidence;
-        doc["last_classification_time"] = lastClassificationTime;
-        
-        String json;
-        serializeJson(doc, json);
-        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", json);
-        response->addHeader("Access-Control-Allow-Origin", "*");
-        request->send(response);
-    });
-    
-    // Latest prediction endpoint
-    server.on("/api/lastprediction", HTTP_GET, [](AsyncWebServerRequest *request){
-        StaticJsonDocument<256> doc;
-        doc["category"] = lastCategory;
-        doc["confidence"] = lastConfidence;
-        doc["timestamp"] = lastClassificationTime;
-        doc["time_ago_ms"] = (millis() - lastClassificationTime);
-        
-        String json;
-        serializeJson(doc, json);
-        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", json);
-        response->addHeader("Access-Control-Allow-Origin", "*");
-        request->send(response);
-    });
-    
-    server.begin();
-    Serial.println("✓ Web server started");
-}
-
-/* Arduino Setup */
+/* Setup ------------------------------------------------------------------ */
 void setup() {
+    // CRITICAL: Serial.begin MUST be first!
     Serial.begin(115200);
-    delay(100);
+    delay(1000);  // Wait for USB to stabilize
     
+    // Optional: Now we can set buffer size (after begin)
+    Serial.setTxBufferSize(1024);
+    
+    // Header
     Serial.println("\n\n");
     Serial.println("╔════════════════════════════════════════════╗");
-    Serial.println("║  ESP32-CAM Waste Classification System    ║");
-    Serial.println("║  with Edge Impulse ML + Web Dashboard     ║");
+    Serial.println("║  ESP32-CAM Waste Classification System     ║");
+    Serial.println("║  With Arcade Dashboard Integration         ║");
     Serial.println("╚════════════════════════════════════════════╝");
     Serial.println();
     
-    // Setup status LED
+    // Setup LED
     pinMode(STATUS_LED, OUTPUT);
     digitalWrite(STATUS_LED, LOW);
     
@@ -344,19 +324,21 @@ void setup() {
     // Setup WiFi
     setupWiFi();
     
-    // Setup web server
+    // Setup web server for video streaming (only if WiFi connected)
     if (WiFi.status() == WL_CONNECTED) {
         setupWebServer();
+        Serial.printf("   Snapshot: http://%s/snapshot\n", WiFi.localIP().toString().c_str());
+        Serial.printf("   Stream:   http://%s/stream\n", WiFi.localIP().toString().c_str());
     }
     
     Serial.println("\n=== System Ready ===");
     Serial.println("Commands: pause, resume, status, reset");
-    Serial.println("Point camera at waste item...\n");
+    Serial.println("=============================\n");
     
     lastInferenceTime = millis();
 }
 
-/* Arduino Loop */
+/* Main Loop -------------------------------------------------------------- */
 void loop() {
     // Handle serial commands
     if (Serial.available()) {
@@ -377,10 +359,8 @@ void loop() {
             Serial.printf("Inference: %s\n", inference_running ? "RUNNING" : "PAUSED");
             Serial.printf("WiFi: %s\n", WiFi.status() == WL_CONNECTED ? "Connected" : "Disconnected");
             if (WiFi.status() == WL_CONNECTED) {
-                Serial.printf("IP Address: %s\n", WiFi.localIP().toString().c_str());
-                Serial.printf("Stream: http://%s/stream\n", WiFi.localIP().toString().c_str());
+                Serial.printf("IP: %s\n", WiFi.localIP().toString().c_str());
             }
-            Serial.printf("Uptime: %lu ms\n", millis());
             Serial.println("====================\n");
         }
         else if (command == "reset") {
@@ -388,21 +368,12 @@ void loop() {
             delay(500);
             ESP.restart();
         }
-        else if (command == "help") {
-            Serial.println("\n=== Available Commands ===");
-            Serial.println("pause  - Stop inference");
-            Serial.println("resume - Start inference");
-            Serial.println("status - Show system info");
-            Serial.println("reset  - Restart ESP32");
-            Serial.println("help   - Show this help");
-            Serial.println("========================\n");
-        }
         else {
-            Serial.println(">>> Unknown command. Type 'help' for commands.");
+            Serial.println(">>> Unknown command. Use: pause, resume, status, reset");
         }
     }
 
-    // Check WiFi connection
+    // Check WiFi reconnection
     if (WiFi.status() != WL_CONNECTED) {
         static unsigned long lastReconnect = 0;
         if (millis() - lastReconnect > 30000) {
@@ -412,37 +383,30 @@ void loop() {
         }
     }
 
-    // Skip inference if paused or interval not reached
+    // Skip inference if paused
     if (!inference_running) {
         delay(100);
         return;
     }
 
+    // Check interval
     if (millis() - lastInferenceTime < INFERENCE_INTERVAL) {
         delay(10);
         return;
     }
-
     lastInferenceTime = millis();
 
-    // ====================================================================
-    // REAL EDGE IMPULSE INFERENCE (Not simulated!)
-    // ====================================================================
+    // Run inference
+    Serial.println("\n📸 Capturing and classifying...");
     
-    Serial.println("\n📸 Capturing image and running inference...");
-    
-    // Allocate snapshot buffer
     snapshot_buf = (uint8_t*)malloc(EI_CAMERA_RAW_FRAME_BUFFER_COLS * 
-                                     EI_CAMERA_RAW_FRAME_BUFFER_ROWS * 
-                                     EI_CAMERA_FRAME_BYTE_SIZE);
-
+                                     EI_CAMERA_RAW_FRAME_BUFFER_ROWS * 3);
     if (!snapshot_buf) {
         Serial.println("✗ Memory allocation failed!");
         delay(1000);
         return;
     }
 
-    // Capture image
     if (!ei_camera_capture((size_t)EI_CLASSIFIER_INPUT_WIDTH, 
                            (size_t)EI_CLASSIFIER_INPUT_HEIGHT, 
                            snapshot_buf)) {
@@ -451,12 +415,10 @@ void loop() {
         return;
     }
 
-    // Prepare signal for Edge Impulse
     ei::signal_t signal;
     signal.total_length = EI_CLASSIFIER_INPUT_WIDTH * EI_CLASSIFIER_INPUT_HEIGHT;
     signal.get_data = &ei_camera_get_data;
 
-    // Run classifier
     ei_impulse_result_t result = {0};
     EI_IMPULSE_ERROR res = run_classifier(&signal, &result, false);
 
@@ -467,18 +429,15 @@ void loop() {
         return;
     }
 
-    // Process classification results
+    // Process results
     Serial.println("\n=== Classification Results ===");
-    
     float best_confidence = 0;
     int best_index = -1;
     String best_category = "";
     
-    // Print all predictions
     for (size_t ix = 0; ix < EI_CLASSIFIER_LABEL_COUNT; ix++) {
         float confidence = result.classification[ix].value;
         String label = String(result.classification[ix].label);
-        
         Serial.printf("  %s: %.2f%%\n", label.c_str(), confidence * 100);
         
         if (confidence > best_confidence) {
@@ -488,23 +447,18 @@ void loop() {
         }
     }
 
-    Serial.println("==============================");
-
-    // Display and send best prediction
+    // Handle detection
     if (best_confidence > CONFIDENCE_THRESHOLD) {
-        Serial.printf("\n✓ DETECTED: %s (%.1f%% confidence)\n", 
-                     best_category.c_str(), 
-                     best_confidence * 100);
+        Serial.printf("\n✓ DETECTED: %s (%.1f%%)\n", 
+                     best_category.c_str(), best_confidence * 100);
         
-        // Update global for stream display
         lastCategory = best_category;
         lastConfidence = best_confidence;
-        lastClassificationTime = millis();
         
-        // Send to web dashboard
+        // Send to Arcade Dashboard
         sendPredictionToBackend(best_category, best_confidence);
         
-        // Blink LED
+        // Blink LED 3 times
         for(int i = 0; i < 3; i++) {
             digitalWrite(STATUS_LED, LOW);
             delay(100);
@@ -512,19 +466,12 @@ void loop() {
             delay(100);
         }
     } else {
-        Serial.printf("\n✗ Low confidence: %.1f%% (threshold: %.1f%%)\n", 
-                     best_confidence * 100, 
-                     CONFIDENCE_THRESHOLD * 100);
-        Serial.println("Please reposition the item or improve lighting");
-        
-        // Update global even for low confidence
-        lastCategory = "Low confidence";
+        Serial.printf("\n✗ Low confidence: %.1f%% (need >%.0f%%)\n", 
+                     best_confidence * 100, CONFIDENCE_THRESHOLD * 100);
+        lastCategory = "Unknown";
         lastConfidence = best_confidence;
-        lastClassificationTime = millis();
     }
 
-    Serial.println("---\n");
-
-    // Clean up
+    Serial.println("==============================\n");
     free(snapshot_buf);
 }

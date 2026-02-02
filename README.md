@@ -62,14 +62,14 @@ Real-time waste classification system using **ESP32-CAM** with Edge Impulse mach
          │ (Predictions)    │
          ▼                  ▼
 ┌─────────────────┐   ┌──────────────┐
-│  Flask Backend  │   │ Web Browser  │
-│  - REST API     │◄──┤ - Dashboard  │
+│  Flask Backend  │   │ Web d  │
 │  - WebSocket    │   │ - Live View  │
 │  - Data Logging │   └──────────────┘
 └─────────────────┘
 ```
 
-**Data Flow:**
+**Data Flow:**Browser  │
+│  - REST API     │◄──┤ - Dashboar
 1. ESP32-CAM captures image every 2 seconds
 2. Edge Impulse model runs inference on-device
 3. Predictions with >60% confidence sent to Flask backend via HTTP
