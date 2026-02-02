@@ -1,1 +1,50 @@
-.pio
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# VS Code
+.vscode/
+
+# Third-party PlatformIO libraries (install via lib_deps instead)
+lib/AsyncTCP/
+lib/ESPAsyncWebServer/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+*.egg-info/
+
+# Logs
+*.log
+dashboard.log
+
+# CSV data files (may contain runtime data)
+predictions_log.csv
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# CodeQL
+_codeql_detected_source_root
+
+# Secrets/credentials (if any)
+secrets.h
+credentials.h
