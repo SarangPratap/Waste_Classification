@@ -2,161 +2,190 @@
 
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-ESP32-orange.svg)](https://platformio.org/)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
+[![Arcade](https://img.shields.io/badge/Arcade-3.0+-green.svg)](https://api.arcade.academy/)
+[![Edge Impulse](https://img.shields.io/badge/Edge%20Impulse-ML-purple.svg)](https://edgeimpulse.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Real-time waste classification system using **ESP32-CAM** with Edge Impulse machine learning, featuring live MJPEG streaming and a modern web dashboard for monitoring and analytics.
+An **Edge AI-powered waste classification system** using ESP32-CAM with on-device machine learning inference. Features a retro-styled **Arcade dashboard** for real-time monitoring with live video streaming and prediction visualization.
 
 <div align="center">
   <img src="https://img.shields.io/badge/Status-Active-success" alt="Status">
   <img src="https://img.shields.io/badge/Hardware-ESP32--CAM-blue" alt="Hardware">
   <img src="https://img.shields.io/badge/ML-Edge%20Impulse-purple" alt="ML Framework">
+  <img src="https://img.shields.io/badge/Categories-9-brightgreen" alt="Categories">
+</div>
+
+---
+
+## 📸 Dashboard Preview
+
+<div align="center">
+  
+  <!-- TODO: Add your screenshot here -->
+  <!-- Example: <img src="docs/images/dashboard_screenshot.png" alt="Arcade Dashboard" width="800"> -->
+  
+  *🎮 Retro Arcade-style Dashboard with live camera feed and real-time predictions*
+  
+  **[Add your dashboard screenshot here]**
+  
 </div>
 
 ---
 
 ## ✨ Features
 
-### 🎯 Core Functionality
-- ✅ **9-Category Waste Classification**
-  - Battery, Biological, Cardboard, Clothes, Glass, Metal, Paper, Plastic, Shoe
-- ✅ **Live MJPEG Video Streaming** from ESP32-CAM
-- ✅ **Real-time Predictions** with confidence scores (>60% threshold)
-- ✅ **Edge Computing** - AI inference runs directly on ESP32
-- ✅ **2-Second Inference Interval** for responsive detection
+### 🎯 Edge AI Classification
+- **9 Waste Categories**: Battery, Biological, Cardboard, Clothes, Glass, Metal, Paper, Plastic, Shoe
+- **On-Device Inference**: ML model runs directly on ESP32-CAM (no cloud required)
+- **60% Confidence Threshold**: Only high-confidence predictions are reported
+- **3-Second Inference Interval**: Balanced between responsiveness and performance
 
-### 🌐 Connectivity
-- ✅ **WiFi Integration** with auto-reconnection
-- ✅ **HTTP Backend Communication** for data logging
-- ✅ **WebSocket Support** for real-time dashboard updates
-- ✅ **REST API** for system integration
+### 📹 Live Video Streaming
+- **MJPEG Stream**: Real-time video from ESP32-CAM at 320x240
+- **Snapshot Endpoint**: On-demand image capture
+- **Low Latency**: Direct camera-to-dashboard streaming
 
-### 📊 Web Dashboard
-- ✅ **Modern Dark Theme** with glass-morphism design
-- ✅ **Live Camera Feed** with MJPEG streaming
-- ✅ **Real-time Prediction Overlay** with animations
-- ✅ **Prediction History** (last 10 items)
-- ✅ **Statistics Dashboard** (totals, averages, distribution)
-- ✅ **Color-Coded Categories** for quick identification
-- ✅ **Fully Responsive** - works on desktop, tablet, and mobile
+### 🎮 Arcade Dashboard
+- **Retro Gaming Aesthetic**: CRT scanline effects, neon colors, pixel-style fonts
+- **Live Camera Feed**: Embedded video stream with overlay
+- **Real-time Predictions**: Animated category display with confidence bars
+- **Statistics Panel**: Total counts, category distribution, session stats
+- **Prediction History**: Color-coded scrolling list of recent detections
+- **Connection Status**: Visual indicators for ESP32 and stream connectivity
 
-### 🛠️ Development Features
-- ✅ **Serial Commands** (pause, resume, status, reset)
-- ✅ **Status LED Indicators** for system state
-- ✅ **CSV Data Logging** for analysis
-- ✅ **Memory Efficient** with proper buffer management
-- ✅ **Error Handling** with graceful degradation
+### 🌐 System Features
+- **WiFi Auto-Reconnection**: Robust connectivity handling
+- **HTTP API**: RESTful endpoints for predictions and status
+- **CSV Logging**: Automatic prediction logging for analysis
+- **Serial Commands**: Runtime control via serial monitor
+- **Status LED**: Visual feedback on ESP32-CAM
 
 ---
 
 ## 🏗️ System Architecture
 
 ```
-┌─────────────────┐
-│   ESP32-CAM     │
-│  - Camera       │
-│  - AI Model     │──MJPEG──┐
-│  - WiFi         │         │
-└────────┬────────┘         │
-         │ HTTP POST        │
-         │ (Predictions)    │
-         ▼                  ▼
-┌─────────────────┐   ┌──────────────┐
-│  Flask Backend  │   │ Web d  │
-│  - WebSocket    │   │ - Live View  │
-│  - Data Logging │   └──────────────┘
-└─────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        ESP32-CAM                                │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
+│  │   Camera    │→ │  Edge AI    │→ │   Async Web Server      │  │
+│  │  OV2640     │  │  Inference  │  │  - /stream (MJPEG)      │  │
+│  └─────────────┘  └─────────────┘  │  - /snapshot (JPEG)     │  │
+│                                    │  - /status (JSON)       │  │
+│                                    └───────────┬─────────────┘  │
+└────────────────────────────────────────────────┼────────────────┘
+                                                 │
+                        WiFi Network             │
+                                                 │
+┌────────────────────────────────────────────────┼────────────────┐
+│                   Arcade Dashboard (Python)    │                │
+│  ┌─────────────────┐  ┌───────────────────────▼──────────────┐  │
+│  │  HTTP Server    │  │      Video Thread                    │  │
+│  │  (Port 5000)    │  │  - MJPEG Stream Consumer             │  │
+│  │  - Predictions  │  │  - Frame Queue Management            │  │
+│  └────────┬────────┘  └──────────────────────────────────────┘  │
+│           │                                                     │
+│  ┌────────▼────────────────────────────────────────────────┐    │
+│  │              Arcade Game Window                          │    │
+│  │  - Live Video Panel    - Stats Panel                     │    │
+│  │  - Prediction Display  - History List                    │    │
+│  │  - CRT Effects         - Connection Status               │    │
+│  └──────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────────────┘
 ```
-
-**Data Flow:**Browser  │
-│  - REST API     │◄──┤ - Dashboar
-1. ESP32-CAM captures image every 2 seconds
-2. Edge Impulse model runs inference on-device
-3. Predictions with >60% confidence sent to Flask backend via HTTP
-4. Flask logs to CSV and broadcasts to connected clients via WebSocket
-5. Web dashboard updates in real-time with prediction overlay
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- ESP32-CAM module
-- USB-to-Serial adapter (for programming)
-- Python 3.8+
-- PlatformIO (VSCode extension or CLI)
 
-### 1. Clone Repository
+| Component | Requirement |
+|-----------|-------------|
+| **Hardware** | ESP32-CAM (AI-Thinker), USB-to-Serial adapter |
+| **Software** | Python 3.8+, PlatformIO (VS Code extension) |
+| **Network** | 2.4GHz WiFi (ESP32 doesn't support 5GHz) |
+
+### 1️⃣ Clone Repository
+
 ```bash
 git clone https://github.com/SarangPratap/Waste_Classification.git
 cd Waste_Classification
 ```
 
-### 2. Configure WiFi Settings
-Edit `include/config.h`:
+### 2️⃣ Configure ESP32-CAM
+
+Edit WiFi and backend settings in `src/main.cpp`:
+
 ```cpp
 #define WIFI_SSID "Your_WiFi_Name"
 #define WIFI_PASSWORD "Your_WiFi_Password"
-#define BACKEND_HOST "192.168.1.100"  // Your computer's IP
+#define BACKEND_HOST "192.168.1.100"  // Your PC's IP address
+#define BACKEND_PORT 5000
 ```
 
-### 3. Flash ESP32-CAM
+### 3️⃣ Flash ESP32-CAM
+
 ```bash
 # Using PlatformIO CLI
 pio run --target upload
 
-# Or use VSCode PlatformIO extension: Click "Upload" button
+# Monitor serial output (115200 baud)
+pio device monitor -b 115200
 ```
 
-### 4. Start Backend Server
+> **Note:** After uploading, press the reset button on your ESP32-CAM.
+
+### 4️⃣ Setup Dashboard
+
 ```bash
-cd server
-pip install -r requirements.txt
-python app.py
+cd dashboard
+pip install -r requirements_arcade.txt
 ```
 
-### 5. Open Dashboard
-Open browser and navigate to:
+### 5️⃣ Configure Dashboard
+
+Edit `dashboard/config.json`:
+
+```json
+{
+  "esp32_ip": "YOUR_ESP32_IP",
+  "stream_port": 80,
+  "http_port": 5000,
+  "confidence_threshold": 0.6,
+  "window_width": 1400,
+  "window_height": 900,
+  "enable_scanlines": true,
+  "max_history": 20
+}
 ```
-http://localhost:5000
+
+> **Tip:** Find ESP32's IP from the Serial Monitor output after WiFi connects.
+
+### 6️⃣ Run Dashboard
+
+```bash
+cd dashboard
+python arcade_dashboard.py
 ```
 
-Enter ESP32-CAM IP address to connect video stream.
-
-**🎉 That's it! Your system is now running!**
-
-For detailed setup instructions, see [docs/SETUP.md](docs/SETUP.md)
+**🎉 Done! The dashboard will open with live video and predictions.**
 
 ---
 
-## 📸 Screenshots
+## 🎨 Waste Categories
 
-### Web Dashboard
-<div align="center">
-  <i>Coming soon - Modern dark theme with live predictions</i>
-</div>
-
-### Features Showcase
-- **Live Video Feed** - Real-time MJPEG stream
-- **Prediction Card** - Animated category display with confidence bar
-- **History List** - Color-coded recent predictions
-- **Statistics** - Total counts and category distribution
-
----
-
-## 🎨 Waste Categories & Colors
-
-| Category | Icon | Color | Use Case |
-|----------|------|-------|----------|
-| Battery | 🔋 | Gold (#FFD700) | Batteries, power cells |
-| Biological | 🍎 | Lime Green (#32CD32) | Food waste, organic |
-| Cardboard | 📦 | Brown (#8B4513) | Boxes, packaging |
-| Clothes | 👕 | Purple (#9370DB) | Textiles, fabrics |
-| Glass | 🫙 | Turquoise (#00CED1) | Bottles, jars |
-| Metal | 🔩 | Gray (#808080) | Cans, metal objects |
-| Paper | 📄 | Sky Blue (#87CEEB) | Documents, newspapers |
-| Plastic | 🍾 | Blue (#1E90FF) | Bottles, containers |
-| Shoe | 👟 | Orange (#FF8C00) | Footwear |
+| Category | Icon | Color | Examples |
+|----------|:----:|-------|----------|
+| **Battery** | 🔋 | Gold | AA/AAA batteries, power cells, lithium batteries |
+| **Biological** | 🍎 | Lime Green | Food waste, fruit peels, organic matter |
+| **Cardboard** | 📦 | Brown | Boxes, packaging, corrugated cardboard |
+| **Clothes** | 👕 | Purple | Textiles, fabrics, garments |
+| **Glass** | 🫙 | Turquoise | Bottles, jars, glass containers |
+| **Metal** | 🔩 | Gray | Cans, foil, metal objects, screws |
+| **Paper** | 📄 | Sky Blue | Documents, newspapers, notebooks |
+| **Plastic** | 🍾 | Blue | Bottles, containers, plastic bags |
+| **Shoe** | 👟 | Orange | Footwear, sneakers, sandals |
 
 ---
 
@@ -164,182 +193,164 @@ For detailed setup instructions, see [docs/SETUP.md](docs/SETUP.md)
 
 ```
 Waste_Classification/
-├── platformio.ini              # PlatformIO configuration
-├── src/
-│   └── main.cpp                # ESP32-CAM firmware
-├── include/
-│   ├── config.h                # WiFi & backend settings
-│   ├── camera_pins.h           # ESP32-CAM pin definitions
-│   └── README                  # Include directory info
-├── server/
-│   ├── app.py                  # Flask backend server
-│   ├── requirements.txt        # Python dependencies
-│   ├── static/
-│   │   ├── index.html          # Web dashboard
-│   │   ├── css/
-│   │   │   └── style.css       # Modern dark theme styles
-│   │   └── js/
-│   │       └── app.js          # WebSocket & UI logic
-│   ├── data/
-│   │   └── predictions.csv     # Logged predictions
-│   └── README.md               # Backend documentation
-├── docs/
+├── 📄 platformio.ini           # PlatformIO build configuration
+├── 📄 README.md                # This file
+│
+├── 📂 src/
+│   └── main.cpp                # ESP32-CAM firmware (WiFi, Camera, ML, Web Server)
+│
+├── 📂 include/
+│   ├── config.h                # Hardware configuration
+│   └── camera_pins.h           # ESP32-CAM pin definitions
+│
+├── 📂 lib/
+│   └── Waste_classification_inferencing/  # Edge Impulse ML model
+│       ├── src/
+│       │   ├── edge-impulse-sdk/          # EI SDK
+│       │   ├── model-parameters/          # Model config
+│       │   └── tflite-model/              # TensorFlow Lite model
+│       └── examples/                      # Platform examples
+│
+├── 📂 dashboard/
+│   ├── arcade_dashboard.py     # Python Arcade dashboard application
+│   ├── config.json             # Dashboard configuration
+│   ├── requirements_arcade.txt # Python dependencies
+│   ├── predictions_log.csv     # Logged predictions (auto-generated)
+│   └── dashboard.log           # Application logs (auto-generated)
+│
+├── 📂 docs/
 │   ├── SETUP.md                # Detailed setup guide
-│   └── API.md                  # API documentation
-├── lib/                        # PlatformIO libraries
-├── test/                       # Test files
-└── README.md                   # This file
+│   ├── API.md                  # API documentation
+│   ├── EDGE_IMPULSE_INTEGRATION.md  # ML model integration guide
+│   └── WIFI_SETUP.md           # WiFi troubleshooting
+│
+└── 📂 test/                    # Test files
 ```
 
 ---
 
-## 🔧 Configuration
+## 🔌 API Reference
 
-### ESP32-CAM Settings (`include/config.h`)
+### ESP32-CAM Endpoints
 
-```cpp
-// WiFi Configuration
-#define WIFI_SSID "YOUR_WIFI_SSID"
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/stream` | GET | MJPEG video stream |
+| `/snapshot` | GET | Single JPEG image |
+| `/status` | GET | System status (JSON) |
 
-// Backend Server
-#define BACKEND_HOST "192.168.1.100"
-#define BACKEND_PORT 5000
+### Dashboard HTTP Server (Port 5000)
 
-// Camera Settings
-#define CAMERA_QUALITY 12          // 0-63 (lower = better quality)
-#define INFERENCE_INTERVAL 2000     // Milliseconds
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/prediction` | POST | Receive prediction from ESP32 |
 
-// Thresholds
-#define CONFIDENCE_THRESHOLD 0.6    // Only send predictions >60%
+### Example: Status Response
+
+```json
+{
+  "status": "running",
+  "wifi": true,
+  "ip": "192.168.1.50",
+  "category": "plastic",
+  "confidence": 0.87
+}
 ```
 
-### Serial Commands
+---
+
+## ⚙️ Configuration Reference
+
+### ESP32 Settings (`src/main.cpp`)
+
+| Define | Default | Description |
+|--------|---------|-------------|
+| `WIFI_SSID` | - | Your WiFi network name |
+| `WIFI_PASSWORD` | - | Your WiFi password |
+| `BACKEND_HOST` | - | Dashboard PC's IP address |
+| `BACKEND_PORT` | 5000 | Dashboard HTTP port |
+| `CONFIDENCE_THRESHOLD` | 0.6 | Minimum confidence (0.0-1.0) |
+| `INFERENCE_INTERVAL` | 3000 | Time between inferences (ms) |
+| `CAMERA_QUALITY` | 12 | JPEG quality (0-63, lower=better) |
+
+### Dashboard Settings (`dashboard/config.json`)
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `esp32_ip` | - | ESP32-CAM's IP address |
+| `stream_port` | 80 | ESP32 web server port |
+| `http_port` | 5000 | Dashboard prediction server port |
+| `confidence_threshold` | 0.6 | Display threshold |
+| `window_width` | 1400 | Dashboard window width |
+| `window_height` | 900 | Dashboard window height |
+| `enable_scanlines` | true | CRT scanline effect |
+| `max_history` | 20 | Prediction history length |
+
+---
+
+## 🔧 Serial Commands
 
 Control ESP32-CAM via Serial Monitor (115200 baud):
 
 | Command | Description |
 |---------|-------------|
-| `pause` | Pause inference temporarily |
-| `resume` | Resume inference |
-| `status` | Display system status |
+| `pause` | Pause ML inference |
+| `resume` | Resume ML inference |
+| `status` | Show system status |
 | `reset` | Restart ESP32-CAM |
 
 ---
 
-## 🌐 API Endpoints
+## 🐛 Troubleshooting
 
-### REST API
+### ESP32-CAM Issues
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | Web dashboard |
-| POST | `/api/prediction` | Receive prediction from ESP32 |
-| GET | `/api/predictions` | Get recent predictions (last 50) |
-| GET | `/api/stats` | Get statistics |
+| Problem | Solution |
+|---------|----------|
+| **WiFi won't connect** | Verify credentials, ensure 2.4GHz network, check power supply (500mA min) |
+| **Camera init failed** | Check PSRAM, verify pin connections, try lower quality setting |
+| **Brownout detected** | Use better power supply, add capacitor, reduce WiFi transmit power |
+| **Upload fails** | Connect GPIO0 to GND during upload, use shorter USB cable |
 
-### WebSocket Events
+### Dashboard Issues
 
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `connect` | Client → Server | Connection established |
-| `disconnect` | Client → Server | Connection closed |
-| `new_prediction` | Server → Client | New prediction broadcast |
+| Problem | Solution |
+|---------|----------|
+| **Can't connect to stream** | Verify ESP32 IP in config.json, ensure same WiFi network |
+| **Stream disconnects** | Check WiFi signal strength, reduce inference interval |
+| **Window won't open** | Install/update graphics drivers, check arcade installation |
+| **Unicode errors in logs** | Windows console issue, logs still work in file |
 
-For detailed API documentation, see [docs/API.md](docs/API.md)
+### Network Issues
 
----
-
-## 📊 Data Logging
-
-Predictions are automatically logged to `server/data/predictions.csv`:
-
-```csv
-timestamp,category,confidence,device_id
-2024-01-09T12:00:00.123456,plastic,0.87,ESP32-CAM-001
-2024-01-09T12:00:02.456789,paper,0.92,ESP32-CAM-001
-```
-
----
-
-## 🧪 Testing
-
-### Test ESP32-CAM
-```bash
-# Monitor serial output
-pio device monitor -b 115200
-```
-
-### Test Backend
-```bash
-# Send test prediction
-curl -X POST http://localhost:5000/api/prediction \
-  -H "Content-Type: application/json" \
-  -d '{"category":"plastic","confidence":0.87,"device_id":"test"}'
-
-# Get statistics
-curl http://localhost:5000/api/stats
-```
-
-### Test WebSocket
-Open browser console on dashboard and check for WebSocket connection messages.
-
----
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-**ESP32 won't connect to WiFi**
-- Verify WiFi credentials in `config.h`
-- Ensure 2.4GHz network (ESP32 doesn't support 5GHz)
-- Check power supply (minimum 500mA)
-
-**Camera initialization fails**
-- Verify pin connections
-- Check PSRAM availability
-- Lower `CAMERA_QUALITY` value
-
-**Dashboard not updating**
-- Check Flask server is running
-- Verify `BACKEND_HOST` matches computer IP
-- Check browser console for errors
-- Ensure devices on same WiFi network
-
-For more troubleshooting, see [docs/SETUP.md](docs/SETUP.md#-troubleshooting)
+| Problem | Solution |
+|---------|----------|
+| **Predictions not received** | Check `BACKEND_HOST` matches your PC's IP |
+| **High latency** | Reduce `CAMERA_QUALITY`, increase `INFERENCE_INTERVAL` |
+| **Connection refused** | Ensure dashboard is running before ESP32 sends predictions |
 
 ---
 
 ## 🛠️ Hardware Requirements
 
-### Required Components
-- **ESP32-CAM** (AI Thinker model recommended)
-- **USB-to-Serial adapter** (FTDI or CP2102)
-- **5V Power supply** (minimum 500mA)
-- **Computer** with WiFi
+### Required
+- **ESP32-CAM** (AI-Thinker module with OV2640 camera)
+- **USB-to-Serial Adapter** (FTDI FT232RL or CP2102)
 
-### Optional Components
-- **Case/enclosure** for ESP32-CAM
-- **External antenna** for better WiFi range
-- **LED indicators** for status
-- **Servo motors** for sorting mechanism (future)
+
+
 
 ---
 
 ## 🔮 Future Enhancements
 
-Planned features (not yet implemented):
-
-- [ ] Database integration (SQLite/PostgreSQL)
-- [ ] User authentication system
 - [ ] Multi-camera support
-- [ ] Export data as CSV/JSON from dashboard
-- [ ] Email/SMS alerts for specific waste types
-- [ ] Integration with physical sorting mechanism
-- [ ] Mobile app (iOS/Android)
+- [ ] Cloud dashboard deployment
+- [ ] Mobile app companion
+- [ ] Physical sorting mechanism integration
 - [ ] Voice announcements
-- [ ] Advanced analytics and reporting
-- [ ] Cloud deployment options
+- [ ] Advanced analytics & reporting
+- [ ] Model retraining interface
 
 ---
 
@@ -361,35 +372,33 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 👨‍💻 Authors
+## 👨‍💻 Author
 
-- **Sarang Pratap** - [GitHub](https://github.com/SarangPratap)
+**Sarang Pratap** - [GitHub](https://github.com/SarangPratap)
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **Edge Impulse** - For ML model framework
-- **Espressif** - For ESP32 platform
-- **Flask** & **Socket.IO** - For backend infrastructure
-- **PlatformIO** - For development environment
+- **[Edge Impulse](https://edgeimpulse.com/)** - ML model training and deployment
+- **[Espressif](https://www.espressif.com/)** - ESP32 platform
+- **[PlatformIO](https://platformio.org/)** - Development environment
+- **[Arcade Library](https://api.arcade.academy/)** - Python game framework for dashboard
 
 ---
 
-## 📧 Contact & Support
-
-- **GitHub Issues:** [Report a bug](https://github.com/SarangPratap/Waste_Classification/issues)
-- **Documentation:** [docs/](docs/)
-- **Email:** [Your email if you want to add]
-
----
-
-## ⭐ Show Your Support
+## ⭐ Support
 
 If you find this project useful, please give it a ⭐ on GitHub!
+
+**Found a bug?** [Open an issue](https://github.com/SarangPratap/Waste_Classification/issues)
 
 ---
 
 <div align="center">
+  
   Made with ❤️ for a cleaner planet 🌍
+  
+  *Reduce • Reuse • Recycle • Classify*
+  
 </div>
