@@ -228,3 +228,9 @@
 2026-02-02 19:03:00,406 [WARNING] MJPEG failed: MJPEG stream failed to open, falling back to snapshot polling
 2026-02-02 19:03:00,406 [INFO] Video: Using snapshot polling http://10.111.150.217:80/snapshot
 2026-02-02 19:03:16,954 [ERROR] Snapshot error: timed out
+2026-02-02 21:49:02,240 [INFO] Video: Attempting MJPEG stream http://10.111.150.217:80/stream
+2026-02-02 21:49:02,240 [INFO] Dashboard ready
+2026-02-02 21:49:02,253 [INFO] HTTP Server on port 5000
+2026-02-02 21:49:47,491 [INFO] Video: Attempting MJPEG stream http://10.111.150.217:80/stream
+2026-02-02 21:49:47,491 [INFO] Dashboard ready
+2026-02-02 21:49:47,500 [INFO] HTTP Server on port 5000
