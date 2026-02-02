@@ -27,12 +27,23 @@ CONFIG = {
     "http_port": 5000,
     "confidence_threshold": 0.6,
     "enable_scanlines": True,
-    "stream_port": 81
+    "stream_port": 80  # Default to port 80 (ESP32 server port)
 }
 
-if os.path.exists('config.json'):
-    with open('config.json', 'r') as f:
-        CONFIG.update(json.load(f))
+# Look for config.json in script directory or parent directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+config_paths = [
+    os.path.join(script_dir, 'config.json'),
+    os.path.join(script_dir, '..', 'config.json'),
+    'config.json'
+]
+
+for config_path in config_paths:
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            CONFIG.update(json.load(f))
+        logger.info(f"Loaded config from: {config_path}")
+        break
 
 CATEGORIES = {
     "battery": {"icon": "🔋", "color": (255, 215, 0, 255), "name": "Battery"},
