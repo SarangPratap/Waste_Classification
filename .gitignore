@@ -1,19 +1,50 @@
-.pio
-.vscode/.browse.c_cpp.db*
-.vscode/c_cpp_properties.json
-.vscode/launch.json
-.vscode/ipch
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
 
-# Ignore config with real credentials (use config.h.example instead)
-include/config.h
+# VS Code
+.vscode/
 
-# Build artifacts
-*.o
-*.a
-*.bin
-*.elf
+# Third-party PlatformIO libraries (install via lib_deps instead)
+lib/AsyncTCP/
+lib/ESPAsyncWebServer/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+*.egg-info/
+
+# Logs
+*.log
+dashboard.log
+
+# CSV data files (may contain runtime data)
+predictions_log.csv
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+*.swp
+*.swo
+*~
 
 # Temporary files
-*~
-*.swp
 *.tmp
+*.temp
+
+# CodeQL
+_codeql_detected_source_root
+
+# Secrets/credentials (if any)
+secrets.h
+credentials.h

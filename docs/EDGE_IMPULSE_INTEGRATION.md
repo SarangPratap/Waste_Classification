@@ -1,200 +1,139 @@
 # Edge Impulse Model Integration Guide
 
-## ⚠️ CRITICAL: Your Edge Impulse Library is Required!
+## ⚠️ CRITICAL: Install Your Edge Impulse Library
 
-This project requires YOUR trained Edge Impulse model to function. The model is NOT included in this repository because it's specific to your training data.
+The ESP32-CAM code requires your **actual Edge Impulse library** to perform real ML inference. Without it, the code will not compile.
 
-## 📥 Step 1: Download Your Model
+## 📦 Step 1: Download Your Edge Impulse Library
 
 1. Go to your Edge Impulse project: https://studio.edgeimpulse.com
 2. Navigate to **Deployment** tab
 3. Select **Arduino library**
-4. Select optimization: **Quantized (int8)**
+4. Select optimization: **Quantized (int8)** for ESP32
 5. Enable **EON Compiler** (optional, for better performance)
 6. Click **Build**
 7. Download the `.zip` file (e.g., `Waste_classification_inferencing.zip`)
 
-## 📂 Step 2: Extract and Install
+## 📁 Step 2: Install the Library in PlatformIO
 
-### Method A: PlatformIO (Recommended)
+### Method A: Via PlatformIO Library Manager (Recommended)
 
-```bash
-# 1. Extract the downloaded .zip file
-unzip Waste_classification_inferencing.zip
+1. Extract the downloaded `.zip` file
+2. Copy the entire extracted folder to your project's `lib/` directory:
+   ```
+   Waste_Classification/
+   ├── lib/
+   │   └── Waste_classification_inferencing/  ← Your Edge Impulse library
+   │       ├── src/
+   │       ├── edge-impulse-sdk/
+   │       ├── model-parameters/
+   │       ├── tflite-model/
+   │       └── library.json
+   ├── src/
+   │   └── main.cpp
+   └── platformio.ini
+   ```
 
-# 2. Copy the entire folder to your project's lib directory
-cp -r Waste_classification_inferencing/ /path/to/Waste_Classification/lib/
+### Method B: Manual Installation
 
-# Your structure should look like:
-# Waste_Classification/
-# ├── lib/
-# │   └── Waste_classification_inferencing/
-# │       ├── src/
-# │       ├── edge-impulse-sdk/
-# │       ├── model-parameters/
-# │       └── library.json
-# ├── src/
-# │   └── main.cpp
-# └── platformio.ini
-```
+1. Extract the `.zip` file to a temporary location
+2. Copy the folder to: `<project>/lib/Waste_classification_inferencing/`
+3. Verify the structure matches the example above
 
-### Method B: Arduino IDE
+## 🔧 Step 3: Verify Integration
 
-1. Open Arduino IDE
-2. Go to **Sketch** → **Include Library** → **Add .ZIP Library**
-3. Select the downloaded `.zip` file
-4. Restart Arduino IDE
+After installing the library, your code should compile successfully with these includes:
 
-## ✅ Step 3: Verify Installation
-
-The code includes this line:
 ```cpp
 #include <Waste_classification_inferencing.h>
+#include "edge-impulse-sdk/dsp/image/image.hpp"
 ```
 
-This will work automatically once you've placed the library in the correct location.
+## 🧪 Step 4: Test Compilation
 
-### Verify in PlatformIO:
 ```bash
-pio lib list
+# Clean build
+pio run --target clean
+
+# Compile
+pio run
+
+# Should compile successfully without errors
 ```
 
-You should see `Waste_classification_inferencing` in the output.
+## 📊 Step 5: Verify Your Model Categories
 
-## 🔧 Step 4: Configure WiFi (Optional)
+Check that your Edge Impulse model has these 9 categories:
+- battery
+- biological
+- cardboard
+- clothes
+- glass
+- metal
+- paper
+- plastic
+- shoe
 
-If you want to use the web dashboard features:
+If your categories are different, update the web dashboard colors in `server/static/js/app.js`.
 
-1. Edit `include/config.h`
-2. Replace WiFi credentials:
+## ❗ Common Issues
+
+### Issue 1: "Waste_classification_inferencing.h: No such file or directory"
+
+**Solution:** The Edge Impulse library is not installed. Follow Step 2 above.
+
+### Issue 2: Library name mismatch
+
+If your Edge Impulse project has a different name, update the include in `src/main.cpp`:
+
 ```cpp
-#define WIFI_SSID "your_wifi_ssid"
-#define WIFI_PASSWORD "your_wifi_password"
+// Change this line to match your library name
+#include <YOUR_PROJECT_NAME_inferencing.h>
 ```
 
-3. Set your backend server (computer running the web dashboard):
-```cpp
-#define BACKEND_HOST "192.168.1.100"  // Your computer's IP
-#define BACKEND_PORT 5000
-```
+### Issue 3: Compilation errors in Edge Impulse SDK
 
-## 📤 Step 5: Upload to ESP32-CAM
+**Solution:** Make sure you downloaded the **Arduino library** (not C++ library) from Edge Impulse deployment.
 
-### Using PlatformIO:
-```bash
-pio run --target upload
-```
+### Issue 4: Memory issues
 
-### Using Arduino IDE:
-1. Select **Tools** → **Board** → **ESP32 Arduino** → **AI Thinker ESP32-CAM**
-2. Select correct COM port
-3. Click **Upload**
-4. Press the **RST** button on ESP32-CAM after upload
+If you get heap/memory errors:
+1. Ensure `board_build.partitions = huge_app.csv` is in `platformio.ini`
+2. Use quantized (int8) model, not float32
+3. Reduce image resolution if needed
 
-## 🖥️ Step 6: Monitor Serial Output
+## 📝 Model Information
 
-```bash
-# PlatformIO
-pio device monitor
-
-# Arduino IDE
-Tools → Serial Monitor (115200 baud)
-```
-
-You should see:
-```
-=================================
-  Waste Classification System
-  Edge Impulse + Web Dashboard
-=================================
-
-✓ Camera initialized
-✓ WiFi connected!
-IP address: 192.168.1.xxx
-✓ Web server started
-   Stream URL: http://192.168.1.xxx/stream
-
-=================================
-System ready! Place item in view.
-=================================
-```
-
-## 🎮 Serial Commands
-
-Send these commands through Serial Monitor:
-
-- `pause` - Stop inference temporarily
-- `resume` - Resume inference
-- `status` - Show system status
-- `reset` - Restart ESP32
-
-## 🌐 Accessing the Camera Stream
-
-Once connected to WiFi, access the camera stream at:
-```
-http://[ESP32_IP_ADDRESS]/stream
-```
-
-Example: `http://192.168.1.150/stream`
-
-## 🚨 Troubleshooting
-
-### "Waste_classification_inferencing.h: No such file"
-✅ **Solution:** The Edge Impulse library is not installed. Follow Step 2 again.
-
-### "Camera init failed 0x20001"
-✅ **Solution:** Check camera ribbon cable connection. Make sure it's properly inserted.
-
-### "WiFi connection failed"
-✅ **Solution:** 
-- Check WiFi credentials in `config.h`
-- Ensure 2.4GHz WiFi (ESP32 doesn't support 5GHz)
-- The system works without WiFi (offline inference only)
-
-### "Malloc failed"
-✅ **Solution:** 
-- Ensure `huge_app.csv` partition is being used
-- Check that PSRAM is enabled in `platformio.ini`
-
-### Predictions are always "Unknown"
-✅ **Solution:**
-- Retrain your model with more diverse data
-- Adjust confidence threshold (currently 0.6) in `main.cpp`
-- Ensure proper lighting conditions
-
-## 📊 Model Information
-
-Your Edge Impulse model should include:
-
-- **Input:** 320x240 RGB images
-- **Output:** Classification labels (e.g., "cardboard", "glass", "metal", "paper", "plastic", "trash")
-- **Format:** Quantized int8 for optimal performance
+Your Edge Impulse model should have:
+- **Input:** 96x96 or 160x160 pixels (RGB)
+- **Output:** 9 classes (waste categories)
+- **Format:** Quantized (int8) for ESP32
+- **Inference time:** < 500ms recommended
 
 ## 🔄 Updating Your Model
 
-To update your model with new training data:
-
-1. Retrain in Edge Impulse Studio
-2. Download new Arduino library
-3. Replace the old library in `lib/` folder
-4. Rebuild and upload to ESP32-CAM
+When you retrain your model:
+1. Download the new Arduino library from Edge Impulse
+2. Delete the old library folder from `lib/`
+3. Install the new library following Step 2
+4. Recompile and upload to ESP32
 
 ## 📚 Additional Resources
 
-- [Edge Impulse Documentation](https://docs.edgeimpulse.com/)
-- [ESP32-CAM Guide](https://randomnerdtutorials.com/esp32-cam-video-streaming-face-recognition-arduino-ide/)
-- [PlatformIO Documentation](https://docs.platformio.org/)
+- [Edge Impulse Arduino Library Documentation](https://docs.edgeimpulse.com/docs/deployment/running-your-impulse-arduino)
+- [ESP32-CAM with Edge Impulse Tutorial](https://docs.edgeimpulse.com/docs/development-platforms/officially-supported-mcu-targets/espressif-esp32)
+- [PlatformIO Library Management](https://docs.platformio.org/en/latest/librarymanager/)
 
-## ⚡ Performance Tips
+## ✅ Checklist
 
-1. **Enable EON Compiler** when deploying - reduces inference time
-2. **Use Quantized (int8)** optimization - smaller model, faster inference
-3. **Good lighting** - improves accuracy significantly
-4. **Proper distance** - keep objects 10-30cm from camera
-5. **Stable mounting** - reduce motion blur
+Before running the system:
+- [ ] Edge Impulse library downloaded from your project
+- [ ] Library installed in `lib/` directory
+- [ ] Code compiles without errors
+- [ ] WiFi credentials configured in `include/config.h`
+- [ ] Flask backend running
+- [ ] ESP32-CAM uploaded and connected
 
-## 🔐 Security Notes
+---
 
-- WiFi credentials are stored in plain text in `config.h`
-- Do not commit `config.h` with real credentials to public repositories
-- Consider using environment variables for production deployments
+**Need Help?** Check the [troubleshooting guide](SETUP.md#troubleshooting) or open an issue on GitHub.
