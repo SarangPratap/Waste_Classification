@@ -22,7 +22,7 @@ An **Edge AI-powered waste classification system** using ESP32-CAM with on-devic
 <div align="center">
   
   <!-- TODO: Add your screenshot here -->
-  <!-- Example: <img src="docs/images/dashboard_screenshot.png" alt="Arcade Dashboard" width="800"> -->
+ <img src="assests/Classification_System.png" alt="Arcade Dashboard" width="800">
   
   *🎮 Retro Arcade-style Dashboard with live camera feed and real-time predictions*
   
